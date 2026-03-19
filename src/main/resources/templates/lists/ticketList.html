@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ticket List</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Library Tickets</h1>
+        <p><a th:href="@{/}">
+            <button type="button">&lt;&lt;</button>
+        </a></p>
+        <!-- Search Form -->
+        <form th:action="@{/tickets/search}" method="get" style="display:flex; gap:8px;">
+            <input type="text" name="description" placeholder="Search by description" />
+            <button type="submit" class="btn">Search</button>
+        </form>
+        <br/>
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th>ID</th>
+                <th>Description</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- Iterate over the 'tickets' model attribute -->
+            <tr th:each="ticket : ${tickets}" style="border-bottom:1px solid #f2f4f7;">
+                <td th:text="${ticket.id}">1</td>
+                <td th:text="${ticket.description}">Description</td>
+                <td th:text="${'$' + ticket.price}">$0.00</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <p><a th:href="@{/tickets}">View All Tickets</a></p>
+    </div>
+</div>
+</body>
+</html>

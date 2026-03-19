@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Book</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Add New Book</h1>
+
+        <p><a th:href="@{/books}">
+            <button type="button">&lt;&lt;</button>
+        </a></p>
+
+        <form action="#" th:action="@{/books/add}" th:object="${book}" method="post">
+            <div class="form-row">
+                <label>Title: <input type="text" th:field="*{name}" required /></label>
+            </div>
+            <div class="form-row">
+                <label>Author: <input type="text" th:field="*{author}" required /></label>
+            </div>
+            <div class="form-row">
+                <label>Price: <input type="number" step="0.01" th:field="*{price}" required /></label>
+            </div>
+            <div class="form-row">
+                <label>Copies: <input type="number" th:field="*{copies}" required /></label>
+            </div>
+            <button type="submit" class="btn">Add Book</button>
+        </form>
+        <br/>
+        <a th:href="@{/books}">Back to List</a>
+    </div>
+</div>
+</body>
+</html>

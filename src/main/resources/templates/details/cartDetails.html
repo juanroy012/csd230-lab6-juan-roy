@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <!-- Header now shows user and sign out -->
+        <h1>Your Shopping Cart</h1>
+        <div th:if="${cart.products.isEmpty()}">
+            <p>Your cart is empty.</p>
+        </div>
+        <table style="width:100%; border-collapse: collapse;" th:unless="${cart.products.isEmpty()}">
+            <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th>Title</th>
+                <th>Price</th>
+                <th class="actions-col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product : ${cart.products}" style="border-bottom:1px solid #f2f4f7;">
+                <!-- Note: We act on 'product' here, which is the parent of BookEntity -->
+                <td th:text="${product.name}"></td>
+                <td th:text="${'$' + product.price}"></td>
+                <td class="action-cell">
+                    <div class="action-group">
+                        <form action="#" th:action="@{/cart/remove/{productId}(productId=${product.id})}" method="post">
+                            <input type="hidden" th:value="${product}" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:unless="${cart.products.isEmpty()}"><a th:href="@{/cart/checkout}">
+            <button type="button" class="btn">Checkout</button>
+        </a></p>
+        <br/>
+        <p>
+            <a th:href="@{/}">Continue Shopping</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

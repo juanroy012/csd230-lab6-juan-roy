@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Magazine Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Magazine Details</h1>
+        <div th:if="${magazine}" th:object="${magazine}">
+            <p><strong>ID:</strong> <span th:text="${magazine.id}"></span></p>
+            <p><strong>Title:</strong> <span th:text="${magazine.name}"></span></p>
+            <p><strong>Issued:</strong> <span th:text="${magazine.currentIssue}"></span></p>
+            <p><strong>Price:</strong> <span th:text="${magazine.price}"></span></p>
+            <p><strong>Copies:</strong> <span th:text="${magazine.copies}"></span></p>
+            <form th:action="@{/cart/add/{id}(id=${magazine.id})}" method="post">
+                <input type="hidden" name="returnTo" th:value="${currentUri}" />
+                <button type="submit" class="btn">Add to cart</button>
+            </form>
+        </div>
+        <div th:unless="${magazine}">
+            <p>No magazine found.</p>
+        </div>
+        <a th:href="@{/magazines}">Back to List</a>
+    </div>
+</div>
+
+<footer class="footer">Library App</footer>
+</body>
+</html>

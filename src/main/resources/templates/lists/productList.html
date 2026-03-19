@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Product List</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Product List</h1>
+        <p><a th:href="@{/}">
+            <button type="button">&lt;&lt;</button>
+        </a></p>
+
+        <p>
+            <a th:href="@{/cart}" class="btn">View Cart</a>
+        </p>
+
+        <br/>
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th>ID</th>
+                <th>Description</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="product : ${products}" style="border-bottom:1px solid #f2f4f7;">
+                <td th:text="${product.id}">1</td>
+                <td th:text="${product.name}">Description</td>
+                <td th:text="${'$' + product.price}">$0.00</td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer class="footer">Library App</footer>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Order List</h1>
+
+        <div th:if="${orders.isEmpty()}">
+            <p>Your order history is empty.</p>
+        </div>
+
+        <table style="width:100%; border-collapse: collapse;" th:unless="${orders.isEmpty()}">
+            <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th>ID</th>
+                <th>Total Amount</th>
+                <th>Order Date</th>
+                <th>Details</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- Iterate over the 'books' model attribute -->
+            <tr th:each="order : ${orders}" style="border-bottom:1px solid #f2f4f7;">
+                <td th:text="${order.id}">ID</td>
+                <td th:text="${order.totalAmount}">Title</td>
+                <td th:text="${order.orderDate}">Author</td>
+                <td><a th:href="@{/cart/order/{id}(id=${order.id})}">
+                    <button type="button" class="btn">Details</button></a></td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <a th:href="@{/}">Back to List</a>
+    </div>
+</div>
+</body>
+</html>

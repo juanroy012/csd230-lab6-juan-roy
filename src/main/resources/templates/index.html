@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Library</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1 style="margin-bottom:18px;">🏬 Library</h1>
+        <div class="grid">
+            <a class="card product-card" th:href="@{/products}">
+                <div>
+                    <h3>📦 View All Products</h3>
+                    <p class="" style="color:var(--muted);">Browse everything.</p>
+                </div>
+            </a>
+
+            <a class="card product-card" th:href="@{/books}">
+                <div>
+                    <h3>📚 View All Books</h3>
+                    <p style="color:var(--muted);">See the book catalog.</p>
+                </div>
+            </a>
+
+            <a class="card product-card" th:href="@{/magazines}">
+                <div>
+                    <h3>📰 View All Magazines</h3>
+                    <p style="color:var(--muted);">Latest magazines.</p>
+                </div>
+            </a>
+
+            <a class="card product-card" th:href="@{/discMags}">
+                <div>
+                    <h3>📰💽 View All Disc Magazines</h3>
+                    <p style="color:var(--muted);">Latest disc magazines.</p>
+                </div>
+            </a>
+
+            <a class="card product-card" th:href="@{/cart/orders}">
+                <div>
+                    <h3>🗃️ View Order History</h3>
+                    <p style="color:var(--muted);">All history</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">Library App</footer>
+</body>
+</html>

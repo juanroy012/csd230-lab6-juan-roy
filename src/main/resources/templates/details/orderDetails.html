@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Order List</h1>
+
+        <p><a th:href="@{/cart/orders}">
+            <button type="button">&lt;&lt;</button>
+        </a></p>
+
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- Iterate over the 'books' model attribute -->
+            <tr th:each="product : ${products}" style="border-bottom:1px solid #f2f4f7;">
+                <td th:text="${product.id}">Product ID</td>
+                <td th:text="${product.name}">Name</td>
+                <td th:text="${'$' + product.price}">$0.00</td>
+            </tr>
+            <tr>
+                <td colspan="2">Total Amount</td>
+                <td th:text="${'$' + order.totalAmount}">$0.00</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <a th:href="@{/}">Back to List</a>
+    </div>
+</div>
+</body>
+</html>

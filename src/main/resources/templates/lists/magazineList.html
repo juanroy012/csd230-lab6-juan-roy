@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Magazine List</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <!-- Header now shows login/user state -->
+        <h1>Magazine List</h1>
+
+        <p><a th:href="@{/}">
+            <button type="button">&lt;&lt;</button>
+        </a></p>
+
+        <div th:if="${errorMessage}" style="color: red; padding: 10px; margin-bottom: 10px;">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+            <tr style="text-align:left; border-bottom:1px solid #e6e6e6;">
+                <th>Title</th>
+                <th>Issued</th>
+                <th>Price</th>
+                <th>Copies</th>
+                <th>Order Quantity</th>
+                <th class="actions-col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="magazine : ${magazines}" style="border-bottom:1px solid #f2f4f7;">
+                <td th:text="${magazine.name}"></td>
+                <td th:text="${magazine.currentIssue}"></td>
+                <td th:text="${magazine.price}"></td>
+                <td th:text="${magazine.copies}"></td>
+                <td th:text="${magazine.orderQty}"></td>
+                <td class="action-cell">
+                    <div class="action-group">
+                        <a th:href="@{/magazines/{id}(id=${magazine.id})}" class="btn button-muted">Details</a>
+                        <form action="#" th:action="@{/cart/add/{id}(id=${magazine.id})}" method="post" style="display:inline;">
+                            <input type="hidden" name="returnTo" th:value="${currentUri}" />
+                            <button type="submit" class="button-muted">Add</button>
+                        </form>
+                        <a th:href="@{/magazines/edit/{id}(id=${magazine.id})}" class="btn button-muted">Edit</a>
+                        <form action="#" th:action="@{/magazines/delete/{id}(id=${magazine.id})}" method="post" style="display:inline;">
+                            <input type="hidden" th:value="${magazine}">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+        <br/>
+        <!-- Add Magazine button: Hidden for normal users -->
+        <div>
+            <a th:href="@{/magazines/add}">Add New Magazine</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">Library App</footer>
+</body>
+
+</html>

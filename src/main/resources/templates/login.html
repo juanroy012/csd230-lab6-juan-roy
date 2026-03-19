@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Please Sign In</h1>
+        <div th:if="${param.error}" style="color:red">
+            Invalid username or password.
+        </div>
+        <div th:if="${param.logout}" style="color:green">
+            You have been logged out.
+        </div>
+        <!-- th:action automatically includes the CSRF token -->
+        <form th:action="@{/login}" method="post">
+            <div class="form-row">
+                <label>Username: <input type="text" name="username" autofocus="autofocus"/></label>
+            </div>
+            <div class="form-row">
+                <label>Password: <input type="password" name="password"/></label>
+            </div>
+            <div class="form-row">
+                <input type="submit" value="Sign In" class="btn"/>
+            </div>
+        </form>
+
+        <p>New user? <a th:href="@{/register}">Register here</a></p>
+    </div>
+</div>
+
+</body>
+</html>

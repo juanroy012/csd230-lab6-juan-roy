@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="icon" th:href="@{/favicon.png}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Book Details</h1>
+        <div th:if="${book}" th:object="${book}">
+            <p><strong>ID:</strong> <span th:text="${book.id}"></span></p>
+            <p><strong>Title:</strong> <span th:text="${book.name}"></span></p>
+            <p><strong>Author:</strong> <span th:text="${book.author}"></span></p>
+            <p><strong>Price:</strong> <span th:text="${book.price}"></span></p>
+            <p><strong>Copies:</strong> <span th:text="${book.copies}"></span></p>
+            <form th:action="@{/cart/add/{id}(id=${book.id})}" method="post">
+                <input type="hidden" name="returnTo" th:value="${currentUri}" />
+                <button type="submit" class="btn">Add to cart</button>
+            </form>
+        </div>
+        <div th:unless="${book}">
+            <p>No book found.</p>
+        </div>
+        <a th:href="@{/books}">Back to List</a>
+    </div>
+</div>
+
+<footer class="footer">Library App</footer>
+</body>
+</html>
