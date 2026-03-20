@@ -47,6 +47,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
 
+            // This project uses a lightweight base64 token (username:timestamp) for React state.
+            // Only attempt JWT parsing for real JWT-shaped tokens (header.payload.signature).
+            if (!accessToken.contains(".")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             // 3. Resolve and Validate the JWT Claims
             // If the token is expired, this method throws an ExpiredJwtException
             Claims claims = jwtUtil.resolveClaims(request);

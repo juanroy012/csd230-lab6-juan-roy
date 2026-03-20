@@ -53,10 +53,9 @@ public class Application implements CommandLineRunner {
 
         // ── Users ────────────────────────────────────────────────────────────
         if (userRepository.count() == 0) {
-            userRepository.save(new UserEntity("admin", passwordEncoder.encode("admin123"), "ADMIN"));
-            userRepository.save(new UserEntity("alice", passwordEncoder.encode("alice123"), "USER"));
-            userRepository.save(new UserEntity("bob",   passwordEncoder.encode("bob123"),   "USER"));
-            System.out.println("Seeded users: admin / alice / bob");
+            userRepository.save(new UserEntity("admin", passwordEncoder.encode("admin"), "ADMIN"));
+            userRepository.save(new UserEntity("user", passwordEncoder.encode("user"), "USER"));
+            System.out.println("Seeded users: admin / user");
         }
 
         // ── Cart ─────────────────────────────────────────────────────────────
@@ -127,7 +126,7 @@ public class Application implements CommandLineRunner {
             System.out.println("Seeded home consoles");
         }
 
-        for (String username : List.of("admin", "alice", "bob")) {
+        for (String username : List.of("admin", "user")) {
             UserEntity user = userRepository.findByUsername(username);
             if (user == null) continue;
 

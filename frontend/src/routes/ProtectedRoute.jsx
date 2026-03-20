@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate, Outlet } from "react-router";
 import { useAuth } from "../provider/authProvider";
 export const ProtectedRoute = () => {

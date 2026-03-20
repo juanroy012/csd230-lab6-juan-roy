@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 
 function Book({ id, name, author, price, copies, onDelete, onUpdate, canManage = false, onAddToCart }) {
     // 1. Local state for "Edit Mode"

@@ -1,47 +1,47 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
-
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import api from "../api/axiosConfig";
 const AuthContext = createContext();
-
 const AuthProvider = ({ children }) => {
     const [token, setToken_] = useState(localStorage.getItem("token"));
-
-    // Helper: Decodes the base64 token to extract username and role
-    const getRolesFromToken = (t) => {
-        if (!t || typeof t !== "string") return [];
-        try {
-            // Decode base64 token
-            const decoded = atob(t);
-            // Token format: username:timestamp
-            const parts = decoded.split(":");
-            // Role is not in token, so fallback to localStorage or context
-            // If you want to use role, you can store it separately or update backend to include it in token
-            // For now, just return empty array
-            return [];
-        } catch (e) {
-            console.error("Failed to decode token", e);
-            return [];
-        }
-    };
-
-    const roles = useMemo(() => getRolesFromToken(token), [token]);
+    const [role, setRole_] = useState(localStorage.getItem("role"));
 
     const setToken = (newToken) => {
         setToken_(newToken);
-        if (newToken) {
-            localStorage.setItem("token", newToken);
+    };
+
+    const setRole = (newRole) => {
+        setRole_(newRole || null);
+    };
+
+    useEffect(() => {
+        if (token) {
+            api.defaults.headers.common["Authorization"] = "Bearer " + token;
+            localStorage.setItem("token", token);
         } else {
+            delete api.defaults.headers.common["Authorization"];
             localStorage.removeItem("token");
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        if (role) {
+            localStorage.setItem("role", role);
+        } else {
+            localStorage.removeItem("role");
+        }
+    }, [role]);
+
+    const isAdmin = role === "ADMIN" || role === "ROLE_ADMIN";
 
     const contextValue = useMemo(
         () => ({
             token,
-            roles,
-            isAdmin: roles.includes("ROLE_ADMIN"),
+            role,
+            isAdmin,
             setToken,
+            setRole,
         }),
-        [token, roles]
+        [token, role, isAdmin]
     );
 
     return (
@@ -50,6 +50,7 @@ const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
 export default AuthProvider;

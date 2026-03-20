@@ -1,12 +1,12 @@
 import axios from 'axios';
-
 const api = axios.create({
     baseURL: '/api/rest'
 });
 
-// REQUEST Interceptor: Runs right before ANY request is sent
+// Axios Interceptor: Runs right before ANY request is sent
 api.interceptors.request.use(
     (config) => {
+        // Dynamically grab the token right when the request fires
         const token = localStorage.getItem('token');
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
@@ -18,24 +18,21 @@ api.interceptors.request.use(
     }
 );
 
-// RESPONSE Interceptor: Handles data returning from the server
 api.interceptors.response.use(
-    (response) => {
-        return response; // Success (2xx)
-    },
+    (response) => response,
     (error) => {
-        // Handle 401 (Expired/Unauthorized) or 403 (Forbidden)
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            console.warn("Security error detected. Redirecting to login...");
+        const status = error?.response?.status;
+        const requestUrl = String(error?.config?.url || '');
+        const isLoginCall = requestUrl.includes('/auth/login');
 
-            // 1. Wipe the stale token from storage
+        if ((status === 401 || status === 403) && !isLoginCall) {
             localStorage.removeItem('token');
-
-            // 2. Hard redirect to Login with an 'expired' flag
+            localStorage.removeItem('role');
             window.location.href = '/login?expired=true';
         }
+
         return Promise.reject(error);
     }
 );
 
-export default api
+export default api;

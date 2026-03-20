@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onDelete, onUpdate }) {
+function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState(name);
     const [tempPrice, setTempPrice] = useState(price);
@@ -12,6 +12,8 @@ function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onD
     const [tempHasDisc, setTempHasDisc] = useState(hasDisc);
 
     const handleSave = () => {
+        if (!canManage) return;
+
         const updatedDiscMag = {
             id,
             name: tempName,
@@ -30,7 +32,7 @@ function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onD
         return new Date(dt).toLocaleString();
     };
 
-    if (isEditing) {
+    if (isEditing && canManage) {
         return (
             <div style={{ border: '2px solid #e67e22', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', gap: '10px', backgroundColor: '#fff8f0', flexWrap: 'wrap' }}>
                 <input type="text" value={tempName} onChange={(e) => setTempName(e.target.value)} placeholder="Name" style={{ flex: 2, minWidth: '120px' }} />
@@ -60,10 +62,15 @@ function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onD
                     <strong>Has Disc:</strong> {hasDisc ? '✅' : '❌'}
                 </p>
             </div>
-            <div>
-                <button onClick={() => setIsEditing(true)} style={{ backgroundColor: '#ffc107', marginRight: '5px' }}>Edit</button>
-                <button onClick={() => onDelete(id)} style={{ backgroundColor: '#ff4444', color: 'white' }}>Delete</button>
-            </div>
+            {canManage ? (
+                <div>
+                    <button onClick={() => setIsEditing(true)} style={{ backgroundColor: '#ffc107', marginRight: '5px' }}>Edit</button>
+                    <button onClick={() => onDelete(id)} style={{ backgroundColor: '#ff4444', color: 'white', marginRight: '5px' }}>Delete</button>
+                    {onAddToCart && <button onClick={() => onAddToCart(id)} style={{ backgroundColor: '#007bff', color: 'white' }}>Add to Cart</button>}
+                </div>
+            ) : (
+                onAddToCart && <button onClick={() => onAddToCart(id)} style={{ backgroundColor: '#007bff', color: 'white' }}>Add to Cart</button>
+            )}
         </div>
     );
 }

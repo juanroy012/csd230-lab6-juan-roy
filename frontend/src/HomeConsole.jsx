@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, onDelete, onUpdate }) {
+function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState(name);
     const [tempMfr, setTempMfr] = useState(manufacturer);
@@ -9,6 +9,8 @@ function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, o
     const [tempRes, setTempRes] = useState(maxResolution);
 
     const handleSave = () => {
+        if (!canManage) return;
+
         onUpdate(id, {
             id,
             name: tempName,
@@ -20,7 +22,7 @@ function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, o
         setIsEditing(false);
     };
 
-    if (isEditing) {
+    if (isEditing && canManage) {
         return (
             <div style={{ border: '2px solid #2980b9', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', gap: '10px', backgroundColor: '#f0f8ff', flexWrap: 'wrap' }}>
                 <input type="text" value={tempName} onChange={(e) => setTempName(e.target.value)} placeholder="Name" style={{ flex: 2, minWidth: '120px' }} />
@@ -45,10 +47,15 @@ function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, o
                     <strong>Max Resolution:</strong> {maxResolution}
                 </p>
             </div>
-            <div>
-                <button onClick={() => setIsEditing(true)} style={{ backgroundColor: '#ffc107', marginRight: '5px' }}>Edit</button>
-                <button onClick={() => onDelete(id)} style={{ backgroundColor: '#ff4444', color: 'white' }}>Delete</button>
-            </div>
+            {canManage ? (
+                <div>
+                    <button onClick={() => setIsEditing(true)} style={{ backgroundColor: '#ffc107', marginRight: '5px' }}>Edit</button>
+                    <button onClick={() => onDelete(id)} style={{ backgroundColor: '#ff4444', color: 'white', marginRight: '5px' }}>Delete</button>
+                    {onAddToCart && <button onClick={() => onAddToCart(id)} style={{ backgroundColor: '#007bff', color: 'white' }}>Add to Cart</button>}
+                </div>
+            ) : (
+                onAddToCart && <button onClick={() => onAddToCart(id)} style={{ backgroundColor: '#007bff', color: 'white' }}>Add to Cart</button>
+            )}
         </div>
     );
 }

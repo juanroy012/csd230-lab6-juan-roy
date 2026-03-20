@@ -10,10 +10,11 @@ import com.juanroy.lab6.repositories.OrderEntityRepository;
 import com.juanroy.lab6.repositories.ProductEntityRepository;
 import com.juanroy.lab6.repositories.UserEntityRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
@@ -37,16 +38,15 @@ public class CartRestController {
     }
 
     @GetMapping
-    public Map<String, Object> getCart(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
-        UserEntity user = resolveUser(authorizationHeader);
+    public Map<String, Object> getCart() {
+        UserEntity user = resolveUser();
         CartEntity cart = getOrCreateCart(user);
         return toCartResponse(cart);
     }
 
     @PostMapping("/add/{productId}")
-    public Map<String, Object> addToCart(@PathVariable Long productId,
-                                         @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
-        UserEntity user = resolveUser(authorizationHeader);
+    public Map<String, Object> addToCart(@PathVariable Long productId) {
+        UserEntity user = resolveUser();
         CartEntity cart = getOrCreateCart(user);
 
         ProductEntity product = productRepository.findById(productId)
@@ -59,9 +59,8 @@ public class CartRestController {
     }
 
     @PostMapping("/remove/{productId}")
-    public Map<String, Object> removeFromCart(@PathVariable Long productId,
-                                              @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
-        UserEntity user = resolveUser(authorizationHeader);
+    public Map<String, Object> removeFromCart(@PathVariable Long productId) {
+        UserEntity user = resolveUser();
         CartEntity cart = getOrCreateCart(user);
 
         ProductEntity product = productRepository.findById(productId)
@@ -74,8 +73,8 @@ public class CartRestController {
     }
 
     @PostMapping("/checkout")
-    public Map<String, Object> checkout(@RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
-        UserEntity user = resolveUser(authorizationHeader);
+    public Map<String, Object> checkout() {
+        UserEntity user = resolveUser();
         CartEntity cart = getOrCreateCart(user);
 
         Set<ProductEntity> productsInCart = new LinkedHashSet<>(cart.getProducts());
@@ -131,26 +130,18 @@ public class CartRestController {
         );
     }
 
-    private UserEntity resolveUser(String authorizationHeader) {
-        if (authorizationHeader == null || authorizationHeader.isBlank() || !authorizationHeader.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token");
+    private UserEntity resolveUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid token");
         }
 
-        String token = authorizationHeader.substring(7).trim();
-        String decoded;
-
-        try {
-            decoded = new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        String username = authentication.getName();
+        if (username == null || username.isBlank() || "anonymousUser".equalsIgnoreCase(username)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid token");
         }
 
-        String[] parts = decoded.split(":", 2);
-        if (parts.length == 0 || parts[0].isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
-        }
-
-        UserEntity user = userRepository.findByUsername(parts[0]);
+        UserEntity user = userRepository.findByUsername(username);
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
         }

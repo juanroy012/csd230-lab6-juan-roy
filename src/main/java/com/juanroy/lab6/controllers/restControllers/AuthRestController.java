@@ -1,15 +1,15 @@
 package com.juanroy.lab6.controllers.restControllers;
 
+import com.juanroy.lab6.auth.JwtUtil;
 import com.juanroy.lab6.entities.UserEntity;
 import com.juanroy.lab6.repositories.UserEntityRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,10 +19,12 @@ public class AuthRestController {
 
     private final UserEntityRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthRestController(UserEntityRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthRestController(UserEntityRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/login")
@@ -41,14 +43,14 @@ public class AuthRestController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
-        // Lightweight session token for frontend state; this app does not validate Bearer tokens server-side.
-        String rawToken = user.getUsername() + ":" + Instant.now().toEpochMilli();
-        String token = Base64.getEncoder().encodeToString(rawToken.getBytes(StandardCharsets.UTF_8));
+        String role = user.getRole();
+        String grantedRole = role != null && role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        String token = jwtUtil.createToken(user.getUsername(), List.of(new SimpleGrantedAuthority(grantedRole)));
 
         return Map.of(
                 "token", token,
                 "username", user.getUsername(),
-                "role", user.getRole()
+                "role", role
         );
     }
 

@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-function Ticket({ id, name, price, onDelete, onUpdate }) {
+function Ticket({ id, name, price, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState(name);
     const [tempPrice, setTempPrice] = useState(price);
 
     const handleSave = () => {
+        if (!canManage) return;
+
         onUpdate(id, { id, name: tempName, price: parseFloat(tempPrice) });
         setIsEditing(false);
     };
 
-    if (isEditing) {
+    if (isEditing && canManage) {
         return (
             <div style={{ border: '2px solid #e74c3c', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', gap: '10px', backgroundColor: '#fff5f5', flexWrap: 'wrap' }}>
                 <input type="text" value={tempName} onChange={(e) => setTempName(e.target.value)} placeholder="Name" style={{ flex: 2, minWidth: '120px' }} />
@@ -27,10 +29,15 @@ function Ticket({ id, name, price, onDelete, onUpdate }) {
                 <h3 style={{ margin: '0 0 5px 0' }}>🎟️ {name}</h3>
                 <p style={{ margin: 0 }}><strong>Price:</strong> ${price?.toFixed(2)}</p>
             </div>
-            <div>
-                <button onClick={() => setIsEditing(true)} style={{ backgroundColor: '#ffc107', marginRight: '5px' }}>Edit</button>
-                <button onClick={() => onDelete(id)} style={{ backgroundColor: '#ff4444', color: 'white' }}>Delete</button>
-            </div>
+            {canManage ? (
+                <div>
+                    <button onClick={() => setIsEditing(true)} style={{ backgroundColor: '#ffc107', marginRight: '5px' }}>Edit</button>
+                    <button onClick={() => onDelete(id)} style={{ backgroundColor: '#ff4444', color: 'white', marginRight: '5px' }}>Delete</button>
+                    {onAddToCart && <button onClick={() => onAddToCart(id)} style={{ backgroundColor: '#007bff', color: 'white' }}>Add to Cart</button>}
+                </div>
+            ) : (
+                onAddToCart && <button onClick={() => onAddToCart(id)} style={{ backgroundColor: '#007bff', color: 'white' }}>Add to Cart</button>
+            )}
         </div>
     );
 }

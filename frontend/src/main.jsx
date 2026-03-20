@@ -2,7 +2,7 @@
 // Posted by Akshat Gupta
 // Retrieved 2026-03-19, License - CC BY-SA 3.0
 
-import React, {StrictMode} from 'react';
+import {StrictMode} from 'react';
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import AuthProvider from './provider/authProvider' // NEW
