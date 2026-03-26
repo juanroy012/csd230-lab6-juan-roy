@@ -1,99 +1,84 @@
 package com.juanroy.lab6.config;
 
+import com.juanroy.lab6.auth.JwtAuthorizationFilter;
 import com.juanroy.lab6.services.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
-    public WebSecurityConfig(CustomUserDetailsService userDetailsService) {
+    public WebSecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthorizationFilter jwtAuthorizationFilter) {
         this.userDetailsService = userDetailsService;
+        this.jwtAuthorizationFilter = jwtAuthorizationFilter;
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    /**
-     * Chain 1 — highest priority, matches only /api/rest/**
-     * Completely stateless: no session, no CSRF, no authentication required.
-     */
     @Bean
-    @Order(1)
-    public SecurityFilterChain restFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/api/rest/**")
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-        return http.build();
-    }
+                // 1. Disable CSRF (we use JWT, so we are stateless)
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/rest/**"))
 
-    /**
-     * Chain 2 — MVC / Thymeleaf app, session-based form login.
-     */
-    @Bean
-    @Order(2)
-    public SecurityFilterChain mvcFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .authorizeHttpRequests(requests -> requests
-                .requestMatchers(
-                    "/h2-console/**",
-                    "/login",
-                    "/register",
-                    "/css/**",
-                    "/js/**",
-                    "/assets/**",
-                    "/favicon.png",
-                    "/index.html",
-                    "/v3/api-docs",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/v3/api-docs.yaml"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll()
-            );
+                // 2. Set Session Management to STATELESS
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-        http.headers(headers -> headers.frameOptions(fo -> fo.disable()));
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+                .authorizeHttpRequests((requests) -> requests
+                        // A. PUBLIC STATIC ASSETS: Allow React to load
+                        .requestMatchers("/", "/index.html", "/assets/**", "/vite.svg", "/favicon.ico").permitAll()
+
+                        // B. PUBLIC AUTH ENDPOINTS: Allow login requests
+                        .requestMatchers("/api/rest/auth/**").permitAll()
+
+                        // C. PUBLIC DEBUG TOOLS: Swagger and H2 Console
+                        .requestMatchers("/h2-console/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                        // D. SECURE THE REST API: Requires ROLE_USER or ROLE_ADMIN (via JWT)
+                        .requestMatchers("/api/rest/**").hasAnyRole("USER", "ADMIN")
+
+                        // E. SECURE MVC ADMIN PAGES: (Only if you still use Thymeleaf occasionally)
+                        .requestMatchers("/books/add", "/books/edit/**", "/books/delete/**").hasRole("ADMIN")
+
+                        // F. Everything else (like the SPA forwarding) needs to be accessible
+                        .anyRequest().permitAll()
+                )
+
+                // 3. EXCEPTION HANDLING: Return 401 for API errors instead of redirecting to a login page
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            if (request.getRequestURI().startsWith("/api/rest/")) {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            } else {
+                                // For everything else, the React app will handle navigation
+                                response.setStatus(HttpServletResponse.SC_OK);
+                            }
+                        })
+                )
+
+                // 4. ADD JWT FILTER: Runs before the standard authentication filter
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Required for H2 Console to work in a browser frame
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         return http.build();
     }
@@ -105,8 +90,12 @@ public class WebSecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
+        // FIX: Pass userDetailsService to the constructor
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 }
+
+
+
