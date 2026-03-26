@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Save } from 'lucide-react';
 
 const field = { display: 'inline-flex', flexDirection: 'column', marginRight: '10px', marginBottom: '10px' };
 const lbl   = { fontSize: '0.72rem', fontWeight: '600', color: '#555', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.4px' };
@@ -44,7 +45,23 @@ function HomeConsoleForm({ onAdded }) {
             <div style={field}><label style={lbl}>Quantity</label><input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="1" style={{ width: '80px' }} /></div>
             <div style={field}><label style={lbl}>Max Resolution</label><input type="text" value={maxResolution} onChange={(e) => setMaxResolution(e.target.value)} required placeholder="e.g. 4K" style={{ width: '100px' }} /></div>
             <br />
-            <button type="submit" style={{ backgroundColor: '#2980b9', color: 'white', padding: '8px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>💾 Save Home Console</button>
+            <button
+                type="submit"
+                style={{
+                    backgroundColor: '#2980b9',
+                    color: 'white',
+                    padding: '8px 20px',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                }}
+            >
+                <Save size={16} />
+                Save Home Console
+            </button>
         </form>
     );
 }

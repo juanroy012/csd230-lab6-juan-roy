@@ -1,4 +1,5 @@
 import  { useState } from 'react';
+import { BookOpen } from 'lucide-react';
 
 function Book({ id, name, author, price, copies, onDelete, onUpdate, canManage = false, onAddToCart }) {
     // 1. Local state for "Edit Mode"
@@ -42,7 +43,10 @@ function Book({ id, name, author, price, copies, onDelete, onUpdate, canManage =
     return (
         <div className="book-row" style={{ border: '1px solid #ccc', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f9f9f9' }}>
             <div className="book-info" style={{ textAlign: 'left' }}>
-                <h3 style={{ margin: '0 0 5px 0' }}>📖 {name}</h3>
+                <h3 style={{ margin: '0 0 5px 0', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <BookOpen size={18} />
+                    {name}
+                </h3>
                 <p style={{ margin: '0' }}>
                     <strong>Author:</strong> {author} | <strong>Price:</strong> ${price?.toFixed(2)} | <strong>Copies:</strong> {copies}
                 </p>

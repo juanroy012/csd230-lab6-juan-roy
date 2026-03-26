@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { DoorOpen } from 'lucide-react';
 
 const navStyle = {
     nav: {
@@ -180,7 +181,20 @@ function Navbar({ isAdmin = false, cartCount = 0 }) {
                 {isAdmin && <DropdownItem to="/add-ticket" label="Add Ticket" type="add" />}
             </DropdownGroup>
 
-            <Link to="/logout" style={{ color: "#ff4444", marginLeft: "auto" }}>🚪 Logout</Link>
+            <Link
+                to="/logout"
+                style={{
+                    color: '#ff4444',
+                    marginLeft: 'auto',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textDecoration: 'none',
+                }}
+            >
+                <DoorOpen size={16} />
+                Logout
+            </Link>
         </nav>
     );
 }

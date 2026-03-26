@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Monitor } from 'lucide-react';
 
 function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -39,7 +40,10 @@ function HomeConsole({ id, name, manufacturer, price, quantity, maxResolution, o
     return (
         <div style={{ border: '1px solid #ccc', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f0f8ff' }}>
             <div style={{ textAlign: 'left' }}>
-                <h3 style={{ margin: '0 0 5px 0' }}>🖥️ {name}</h3>
+                <h3 style={{ margin: '0 0 5px 0', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Monitor size={18} />
+                    {name}
+                </h3>
                 <p style={{ margin: 0 }}>
                     <strong>Manufacturer:</strong> {manufacturer} |{' '}
                     <strong>Price:</strong> ${price?.toFixed(2)} |{' '}

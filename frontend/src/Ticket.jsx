@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Ticket as TicketIcon } from 'lucide-react';
 
 function Ticket({ id, name, price, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -26,7 +27,10 @@ function Ticket({ id, name, price, onDelete, onUpdate, canManage = false, onAddT
     return (
         <div style={{ border: '1px solid #ccc', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff5f5' }}>
             <div>
-                <h3 style={{ margin: '0 0 5px 0' }}>🎟️ {name}</h3>
+                <h3 style={{ margin: '0 0 5px 0', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <TicketIcon size={18} />
+                    {name}
+                </h3>
                 <p style={{ margin: 0 }}><strong>Price:</strong> ${price?.toFixed(2)}</p>
             </div>
             {canManage ? (

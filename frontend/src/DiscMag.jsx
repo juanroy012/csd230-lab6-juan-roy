@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CircleCheckBig, CircleX, Disc3 } from 'lucide-react';
 
 function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -53,13 +54,17 @@ function DiscMag({ id, name, price, copies, orderQty, currentIssue, hasDisc, onD
     return (
         <div style={{ border: '1px solid #ccc', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fffaf5' }}>
             <div style={{ textAlign: 'left' }}>
-                <h3 style={{ margin: '0 0 5px 0' }}>💿 {name}</h3>
+                <h3 style={{ margin: '0 0 5px 0', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Disc3 size={18} />
+                    {name}
+                </h3>
                 <p style={{ margin: '0' }}>
                     <strong>Price:</strong> ${price?.toFixed(2)} |{' '}
                     <strong>Copies:</strong> {copies} |{' '}
                     <strong>Order Qty:</strong> {orderQty} |{' '}
                     <strong>Current Issue:</strong> {formatDate(currentIssue)} |{' '}
-                    <strong>Has Disc:</strong> {hasDisc ? '✅' : '❌'}
+                    <strong>Has Disc:</strong>{' '}
+                    {hasDisc ? <CircleCheckBig size={16} color="#2e7d32" /> : <CircleX size={16} color="#c62828" />}
                 </p>
             </div>
             {canManage ? (

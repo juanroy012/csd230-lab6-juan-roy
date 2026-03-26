@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Newspaper } from 'lucide-react';
 
 function Magazine({ id, name, price, copies, orderQty, currentIssue, onDelete, onUpdate, canManage = false, onAddToCart }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -47,7 +48,10 @@ function Magazine({ id, name, price, copies, orderQty, currentIssue, onDelete, o
     return (
         <div className="magazine-row" style={{ border: '1px solid #ccc', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fdf5ff' }}>
             <div className="magazine-info" style={{ textAlign: 'left' }}>
-                <h3 style={{ margin: '0 0 5px 0' }}>📰 {name}</h3>
+                <h3 style={{ margin: '0 0 5px 0', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Newspaper size={18} />
+                    {name}
+                </h3>
                 <p style={{ margin: '0' }}>
                     <strong>Price:</strong> ${price?.toFixed(2)} |{' '}
                     <strong>Copies:</strong> {copies} |{' '}
